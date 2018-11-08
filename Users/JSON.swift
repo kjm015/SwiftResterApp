@@ -17,30 +17,21 @@ struct User: Codable {
     let lastName: String
     let avatar: String
     
-    private enum CodingKeys: String, CodingKey {
-        case firstName = "first_name"
-        case lastName = "last_name"
+    enum CodingKeys: String, CodingKey {
+        case firstName
+        case lastName
         case avatar
     }
 }
 
 // Create structures to describe JSON responses
 
-struct UserPostResponse: Codable {
+struct UserPostResponse: Decodable {
     let firstName: String
     let lastName: String
     let avatar: String
     
-    let id: Int
+    let id: String
     let createdAt: String
-    
-    private enum CodingKeys: String, CodingKey {
-        case firstName = "first_name"
-        case lastName = "last_name"
-        case avatar
-        
-        case id
-        case createdAt = "created_at"
-    }
 }
 

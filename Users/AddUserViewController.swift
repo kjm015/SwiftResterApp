@@ -72,11 +72,15 @@ class AddUserViewController: UIViewController, UITextFieldDelegate {
                     print("Unexpected HTTP response: \(httpResponse!.statusCode) \(error!)")
                 } else {
                     // Else, display "user created" message in alert
-                    do {
-                        let resp = try JSONDecoder().decode(UserPostResponse.self, from: data!)
-                        self.presentAlert(title: "User Created", message: "Your new user \(resp.lastName) has been created")
-                    } catch {
-                        print("The struggle is real: JSON decoding failed")
+                
+                    guard let resp = try? JSONDecoder().decode(UserPostResponse.self, from: data!) else {
+                        print("JSON decoding failed, data: \(data!.description)")
+                        return
+                    }
+                    
+                    // Display alert in main thread
+                    DispatchQueue.main.async {
+                        self.presentAlert(title: "User Created", message: "Your new user \(resp.firstName) \(resp.lastName) has been created!")
                     }
                 }
             }

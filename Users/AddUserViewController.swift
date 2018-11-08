@@ -12,7 +12,7 @@ class AddUserViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: - Variables
     
-    var urlString: String = "https://reqres.in/api/users"
+    public var urlString: String = "https://reqres.in/api/users"
 
     // MARK: - Outlets
     

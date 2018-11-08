@@ -9,6 +9,8 @@
 import UIKit
 
 class GetSingleUserViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
+    
+    var urlString: String = "https://reqres.in/api/users"
 
     // MARK: - Outlets
     
@@ -38,14 +40,37 @@ class GetSingleUserViewController: UIViewController, UIPickerViewDataSource, UIP
         
         // Get the selected row of the picker view
         
+        let id = idPickerView.selectedRow(inComponent: 1)
+        
         // Try to download the data for the user with the selected id
         
-        // If response code was 404, display "user not found" alert
+        guard let url = URL(string: urlString) else {
+            // Perform some error handling
+            print("Invalid URL string")
+            return
+        }
         
-        // Else if response code was not 200, print error to console
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.cachePolicy = URLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        // Else, decode JSON and manually call
-        // performSegue(withIdentifier: "Show Detail", sender: self)
+        let task = URLSession.shared.downloadTask(with: request) {
+            (data, response, error) in
+            
+            let httpResponse = response as? HTTPURLResponse
+            
+            if httpResponse!.statusCode == 200 {
+                // Decode JSON and manually call performSegue(withIdentifier: "Show Detail", sender: self)
+                
+            } else if httpResponse!.statusCode == 404 {
+                // If response code was 404, display "user not found" alert
+                print("Error 404 User not found! \(error!)")
+            } else {
+                // Else if response code was not 200, print error to console
+                print("Unexpected HTTP response: \(httpResponse!.statusCode) \(error!)")
+            }
+        }
     }    
 
     func presentAlert(title: String, message: String) {

@@ -35,3 +35,15 @@ struct UserPostResponse: Decodable {
     let createdAt: String
 }
 
+struct UserGetResponse: Decodable {
+    let id: String
+    
+    let firstName: String
+    let lastName: String
+    let avatar: String
+}
+
+struct GetResponseData: Decodable {
+    let data: UserGetResponse
+}
+

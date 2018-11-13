@@ -40,37 +40,56 @@ class GetSingleUserViewController: UIViewController, UIPickerViewDataSource, UIP
         
         // Get the selected row of the picker view
         
-        let id = idPickerView.selectedRow(inComponent: 1)
+        let id = idPickerView.selectedRow(inComponent: 0) + 1
+        print("the id is \(id)")
+        let realUrlString: String = "\(urlString)/\(id)"
         
         // Try to download the data for the user with the selected id
         
-        guard let url = URL(string: urlString) else {
+        guard let url = URL(string: realUrlString) else {
             // Perform some error handling
             print("Invalid URL string")
             return
         }
         
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.cachePolicy = URLRequest.CachePolicy.reloadIgnoringLocalCacheData
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        //var request = URLRequest(url: url)
+        //request.httpMethod = "GET"
+        //request.cachePolicy = URLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        //request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let task = URLSession.shared.downloadTask(with: request) {
+        let task = URLSession.shared.dataTask(with: url) {
             (data, response, error) in
             
             let httpResponse = response as? HTTPURLResponse
             
-            if httpResponse!.statusCode == 200 {
-                // Decode JSON and manually call performSegue(withIdentifier: "Show Detail", sender: self)
-                
-            } else if httpResponse!.statusCode == 404 {
+            if httpResponse!.statusCode == 404 {
                 // If response code was 404, display "user not found" alert
                 print("Error 404 User not found! \(error!)")
+            } else if httpResponse!.statusCode != 200 {
+                print("Error invalid response! \(error!)")
+            } else if (data == nil && error != nil) {
+                print("Error! \(error!)")
             } else {
-                // Else if response code was not 200, print error to console
-                print("Unexpected HTTP response: \(httpResponse!.statusCode) \(error!)")
+                // Decode JSON and manually call performSegue(withIdentifier: "Show Detail", sender: self)
+                if let s = String(data: data!, encoding: String.Encoding.utf8) {
+                    print(s)
+                }
+                
+                do {
+                    let resp = try JSONDecoder().decode(GetResponseData.self, from: data!)
+                    
+                    DispatchQueue.main.async {
+                        self.presentAlert(title: "User Retrieved", message: "Your user \(resp.data.first_name) \(resp.data.last_name) has been found!")
+                    }
+
+                } catch {
+                    print("JSON decoding failed, data: \(data!.description) \(data!)")
+                }
+                
+                // Display alert in main thread
             }
         }
+        task.resume()
     }    
 
     func presentAlert(title: String, message: String) {

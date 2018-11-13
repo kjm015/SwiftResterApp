@@ -36,10 +36,10 @@ struct UserPostResponse: Decodable {
 }
 
 struct UserGetResponse: Decodable {
-    let id: String
+    let id: Int
     
-    let firstName: String
-    let lastName: String
+    let first_name: String
+    let last_name: String
     let avatar: String
 }
 

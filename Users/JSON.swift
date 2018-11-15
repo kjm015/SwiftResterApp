@@ -13,9 +13,9 @@ struct UserData: Decodable {
 }
 
 struct User: Codable {
-    let firstName: String
-    let lastName: String
-    let avatar: String
+    var firstName: String
+    var lastName: String
+    var avatar: String
     
     enum CodingKeys: String, CodingKey {
         case firstName

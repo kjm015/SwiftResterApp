@@ -11,6 +11,7 @@ import UIKit
 class GetSingleUserViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
     
     var urlString: String = "https://reqres.in/api/users"
+    var user1: User = User(firstName: "", lastName: "", avatar: "")
 
     // MARK: - Outlets
     
@@ -31,6 +32,8 @@ class GetSingleUserViewController: UIViewController, UIPickerViewDataSource, UIP
             let controller = segue.destination as! DetailViewController
             
             // Set properties of controller as needed to pass objects
+            controller.detailItem = user1
+            
         }
     }
 
@@ -78,8 +81,16 @@ class GetSingleUserViewController: UIViewController, UIPickerViewDataSource, UIP
                 do {
                     let resp = try JSONDecoder().decode(GetResponseData.self, from: data!)
                     
+                    let getRekt: UserGetResponse = resp.data
+                    
+                    self.user1 = User(firstName: getRekt.first_name, lastName: getRekt.last_name, avatar: getRekt.avatar)
+                    
+//                    DispatchQueue.main.async {
+//                        self.presentAlert(title: "User Retrieved", message: "Your user \(resp.data.first_name) \(resp.data.last_name) has been found!")
+//                    }
+                    
                     DispatchQueue.main.async {
-                        self.presentAlert(title: "User Retrieved", message: "Your user \(resp.data.first_name) \(resp.data.last_name) has been found!")
+                        self.performSegue(withIdentifier: "Show Detail", sender: self)
                     }
 
                 } catch {
@@ -90,6 +101,7 @@ class GetSingleUserViewController: UIViewController, UIPickerViewDataSource, UIP
             }
         }
         task.resume()
+        
     }    
 
     func presentAlert(title: String, message: String) {

@@ -9,6 +9,8 @@
 import UIKit
 
 class DeleteUserViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
+    
+    public var urlString: String = "https://reqres.in/api/users"
 
     // MARK: - Outlets
     
@@ -27,11 +29,44 @@ class DeleteUserViewController: UIViewController, UIPickerViewDataSource, UIPick
     // MARK: - DeleteUserViewController methods
     
     @IBAction func userSelected(_ sender: UIButton) {
+        
         // Get the selected row of the picker view
+        let id = idPickerView.selectedRow(inComponent: 0) + 1
+        print("the id is \(id)")
+        let realUrlString: String = "\(urlString)/\(id)"
         
         // Try to delete the user with the selected id
         
+        guard let url = URL(string: realUrlString) else {
+            // Perform some error handling
+            print("Invalid URL string")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        
         // If response code was not 204, print error to console
+        
+        let task = URLSession.shared.dataTask(with: request) {
+            (data, response, error) in
+            
+            let httpResponse = response as? HTTPURLResponse
+            
+            if httpResponse!.statusCode == 404 {
+                print("Error 404 User not found! \(error!)")
+            } else if httpResponse!.statusCode != 204 {
+                print("Error invalid response! \(error!)")
+            } else if (data == nil && error != nil) {
+                print("Error! \(error!)")
+            } else {
+                // Display alert in main thread
+                DispatchQueue.main.async {
+                    self.presentAlert(title: "User Removed", message: "User \(id) has been deleted!")
+                }
+            }
+        }
+        task.resume()
         
         // Else, display "user deleted" alert
     }

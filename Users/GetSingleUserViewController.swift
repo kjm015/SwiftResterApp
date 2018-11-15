@@ -85,10 +85,6 @@ class GetSingleUserViewController: UIViewController, UIPickerViewDataSource, UIP
                     
                     self.user1 = User(firstName: getRekt.first_name, lastName: getRekt.last_name, avatar: getRekt.avatar)
                     
-//                    DispatchQueue.main.async {
-//                        self.presentAlert(title: "User Retrieved", message: "Your user \(resp.data.first_name) \(resp.data.last_name) has been found!")
-//                    }
-                    
                     DispatchQueue.main.async {
                         self.performSegue(withIdentifier: "Show Detail", sender: self)
                     }

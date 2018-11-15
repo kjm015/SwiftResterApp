@@ -13,6 +13,7 @@ class UserListViewController: UITableViewController {
     // MARK: - Properties
     
     var users = [User]()
+    var urlString: String = "https://reqres.in/api/users?page=1&per_page=12"
     
     // MARK: - UIViewController methods
     
@@ -41,6 +42,42 @@ class UserListViewController: UITableViewController {
     func populateTable() {
         
         // Download data for all users, decode JSON,
+        
+        guard let url = URL(string: urlString) else {
+            // Perform some error handling
+            print("Invalid URL string")
+            return
+        }
+        
+        let task = URLSession.shared.dataTask(with: url) {
+            (data, response, error) in
+            
+            let httpResponse = response as? HTTPURLResponse
+            
+            if httpResponse!.statusCode == 404 {
+                // If response code was 404, display "user not found" alert
+                print("Error 404 User not found! \(error!)")
+            } else if httpResponse!.statusCode != 200 {
+                print("Error invalid response! \(error!)")
+            } else if (data == nil && error != nil) {
+                print("Error! \(error!)")
+            } else {
+                do {
+                    let resp = try JSONDecoder().decode(UserData.self, from: data!)
+                    
+                    self.users = resp.data
+                    
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                    
+                } catch {
+                    print("JSON decoding failed, data: \(data!.description) \(data!)")
+                }
+            }
+        }
+        task.resume()
+        
         // add objects to array, reload table view
     }
 
